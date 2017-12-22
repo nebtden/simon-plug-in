@@ -18,7 +18,7 @@ file_put_contents("log.txt", Date('Y-m-d H:i:s').'notify:'.json_encode($data)."\
 
 $lipapay_sign = $data['sign'];
 unset($data['sign']);
-$my_sign = sign($data,$lipapay_key);
+$my_sign = lipapay_sign($data,$lipapay_key);
 if($my_sign==$lipapay_sign){
     if($data['status']=='SUCCESS'){
         //处理逻辑

@@ -18,11 +18,7 @@ $param['amount']  = '1';
 $param['buyerId']  = '1';
 $data = tolipapay($param);
 
-//file_put_contents("log.txt", Date('Y-m-d H:i:s').'request:'.json_encode($data).'\n', FILE_APPEND);
 
-
-//调用表单
-require_once 'lipapay.form.php';
 
 ?>
 

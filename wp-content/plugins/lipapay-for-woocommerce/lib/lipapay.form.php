@@ -18,7 +18,7 @@
             <input name="currency" id="currency" type="hidden" value="<?php echo  $data['currency']; ?>" ><div class="box-footer">
 
             </div>
-            
+
 
         </div>
 

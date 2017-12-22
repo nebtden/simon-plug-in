@@ -39,9 +39,9 @@ if(!function_exists('lipapay_wc_payment_gateway_init')){
         require_once WC_LIPAPAY_DIR .'/class-lipapay-wc-payment-gateway.php';
         $api = new LIPAPAYWCPaymentGateway();
         
-        $api->check_wechatpay_response();
+        $api->check_lipapay_response();
         
-        add_filter('woocommerce_payment_gateways',array($api,'woocommerce_wechatpay_add_gateway' ),10,1);
+        add_filter('woocommerce_payment_gateways',array($api,'woocommerce_lipapay_add_gateway' ),10,1);
         add_action( 'wp_ajax_XH_WECHAT_PAYMENT_GET_ORDER', array($api, "get_order_status" ) );
         add_action( 'wp_ajax_nopriv_LIPAPAY_PAYMENT_GET_ORDER', array($api, "get_order_status") );
         add_action( 'woocommerce_receipt_'.$api->id, array($api, 'receipt_page'));
@@ -59,4 +59,5 @@ function lipapay_payment_gateway_plugin_edit_link( $links ){
         $links
     );
 }
+//simon zhang  meixihu chuangxin zhongxin  hunan changsha CN19 414401 CN
 ?>

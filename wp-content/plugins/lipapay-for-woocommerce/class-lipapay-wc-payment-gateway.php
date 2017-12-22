@@ -6,7 +6,7 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
     private $config;
     
 	public function __construct() {
-		//支持退款
+
 		array_push($this->supports,'refunds');
 
 		$this->id = WC_LIPAPAY_ID;
@@ -24,9 +24,9 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 		
 		$lib = WC_LIPAPAY_DIR.'/lib';
 		
-		include_once ($lib . '/index.php');
+
 		include_once ($lib . '/lipapay.php');
-		include_once ($lib . '/lipapay.form.php');
+// 		include_once ($lib . '/lipapay.form.php');
 		include_once ($lib . '/lipapay.sign.php');
 		include_once ($lib . '/notify.php');
 		include_once ($lib . '/return.php');
@@ -36,48 +36,56 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 	function init_form_fields() {
 	    $this->form_fields = array (
 	        'enabled' => array (
-	            'title' => __ ( 'Enable/Disable', 'wechatpay' ),
+	            'title' => __ ( 'Enable/Disable', 'lipapay' ),
 	            'type' => 'checkbox',
-	            'label' => __ ( 'Enable WeChatPay Payment', 'wechatpay' ),
+	            'label' => __ ( 'Enable Lipapay Payment', 'lipapay' ),
 	            'default' => 'no'
 	        ),
 	        'title' => array (
-	            'title' => __ ( 'Title', 'wechatpay' ),
+	            'title' => 'Lipapay',
 	            'type' => 'text',
-	            'description' => __ ( 'This controls the title which the user sees during checkout.', 'wechatpay' ),
-	            'default' => __ ( 'WeChatPay', 'wechatpay' ),
+	            'description' => __ ( 'This controls the title which the user sees during checkout.', 'Lipapay' ),
+	            'default' => 'Lipapay',
 	            'css' => 'width:400px'
 	        ),
 	        'description' => array (
-	            'title' => __ ( 'Description', 'wechatpay' ),
+	            'title' => __ ( 'Description', 'Lipapay' ),
 	            'type' => 'textarea',
-	            'description' => __ ( 'This controls the description which the user sees during checkout.', 'wechatpay' ),
-	            'default' => __ ( "Pay via WeChatPay, if you don't have an WeChatPay account, you can also pay with your debit card or credit card", 'wechatpay' ),
+	            'description' =>  'This controls the description which the user sees during checkout.', 'Lipapay' ,
+	            'default' => "Pay via lipapay, if you don't have an Lipapay account, you should contact us", 'Lipapay' ,
 	            //'desc_tip' => true ,
 	            'css' => 'width:400px'
 	        ),
 	        'LIPAPAY_URL' => array (
-	            'title' => __ ( 'Application ID', 'lipapay' ),
+	            'title' => __ ( 'Application ID', 'Lipapay' ),
 	            'type' => 'text',
-	            'description' => __ ( 'Please enter the Application ID,If you don\'t have one, <a href="https://pay.weixin.qq.com" target="_blank">click here</a> to get.', 'wechatpay' ),
+	            'description' => __ ( 'Please enter the LIPAPAY URL,Generally not required ', 'Lipapay' ),
 	            'css' => 'width:400px'
 	        ),
 	        'LIPAPAY_MerchantNo' => array (
-	            'title' => __ ( 'lipapay Merchant ID', 'lipapay' ),
+	            'title' => __ ( 'lipapay Merchant ID', 'Lipapay' ),
 	            'type' => 'text',
-	            'description' => __ ( 'Please enter the Merchant ID,If you don\'t have one, <a href="https://pay.weixin.qq.com" target="_blank">click here</a> to get.', 'wechatpay' ),
+	            'description' => __ ( 'Please enter the LIPAPAY MerchantNo，required ', 'Lipapay' ),
 	            'css' => 'width:400px'
 	        ),
 	        'LIPAPAY_KEY' => array (
-	            'title' => __ ( 'lipapay Key', 'lipapay' ),
+	            'title' => __ ( 'lipapay Key', 'KES' ),
 	            'type' => 'text',
-	            'description' => __ ( 'Please enter your WeChatPay Key; this is needed in order to take payment.', 'wechatpay' ),
+	            'description' => __ ( 'Please enter the LIPAPAY KEY，required.', 'Lipapay' ),
 	            'css' => 'width:400px',
 	            //'desc_tip' => true
-	        )
+	        ),
+            'lipapay_monetary_unit' => array (
+                'title' => __ ( 'lipapay Key', 'lipapay' ),
+                'type' => 'select',
+                'description' => __ ( 'Please enter monetary unit，such as kes....', 'Lipapay' ),
+                'css' => 'width:400px',
+                //'desc_tip' => true
+            )
+
 	    );
-	
 	}
+
 	
 	public function process_payment($order_id) {
 	    $order = new WC_Order ( $order_id );
@@ -87,7 +95,7 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 	    );
 	}
 	
-	public  function woocommerce_wechatpay_add_gateway( $methods ) {
+	public  function woocommerce_lipapay_add_gateway( $methods ) {
 	    $methods[] = $this;
 	    return $methods;
 	}
@@ -115,7 +123,7 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 		    }    
 		}
 		
-		return apply_filters('xh_wechat_wc_get_order_title', mb_strimwidth ( $title, 0,32, '...','utf-8'));
+		return apply_filters('lipapay_wc_get_order_title', mb_strimwidth ( $title, 0,32, '...','utf-8'));
 	}
 	
 	public function get_order_status() {
@@ -138,14 +146,14 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 		if ($this->id == $payment_method) {
 			if (is_checkout_pay_page () && ! isset ( $_GET ['pay_for_order'] )) {
 			    
-			    wp_enqueue_script ( 'XH_WECHAT_JS_QRCODE', XH_WC_WeChat_URL. '/js/qrcode.js', array (), XH_WC_WeChat_VERSION );
-				wp_enqueue_script ( 'XH_WECHAT_JS_CHECKOUT', XH_WC_WeChat_URL. '/js/checkout.js', array ('jquery','XH_WECHAT_JS_QRCODE' ), XH_WC_WeChat_VERSION );
+			    wp_enqueue_script ( 'LIPAPAY_JS_QRCODE', XH_WC_WeChat_URL. '/js/qrcode.js', array (), XH_WC_WeChat_VERSION );
+				wp_enqueue_script ( 'LIPAPAY_JS_CHECKOUT', XH_WC_WeChat_URL. '/js/checkout.js', array ('jquery','XH_WECHAT_JS_QRCODE' ), XH_WC_WeChat_VERSION );
 				
 			}
 		}
 	}
 	
-	public function check_wechatpay_response() {
+	public function check_lipapay_response() {
 	    if(defined('WP_USE_THEMES')&&!WP_USE_THEMES){
 	        return;
 	    }
@@ -258,51 +266,63 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 	        wp_redirect($this->get_return_url($order));
 	        exit;
 	    }
-	    
-        echo '<p>' . __ ( 'Please scan the QR code with WeChat to finish the payment.', 'wechatpay' ) . '</p>';
 
-		$input = new WechatPaymentUnifiedOrder ();
-		$input->SetBody ($this->get_order_title($order) );
-	
-		$input->SetAttach ( $order_id );
-		$input->SetOut_trade_no ( md5(date ( "YmdHis" ).$order_id ));    
-		$total = $order->get_total ();
-        
-		$exchange_rate = floatval($this->get_option('exchange_rate'));
-		if($exchange_rate<=0){
-		    $exchange_rate=1;
-		}
-		
-		$total = round ($total * $exchange_rate, 2 );
-        $totalFee = ( int ) ($total * 100);
-        
-		$input->SetTotal_fee ( $totalFee );
-		
-		$date = new DateTime ();
-		$date->setTimezone ( new DateTimeZone ( 'Asia/Shanghai' ) );
-		$startTime = $date->format ( 'YmdHis' );
-		$input->SetTime_start ( $startTime );
-		$input->SetNotify_url (get_option('siteurl') );
-	
-		$input->SetTrade_type ( "NATIVE" );
-		$input->SetProduct_id ($order_id );
-		try {
-		    $result = WechatPaymentApi::unifiedOrder ( $input, 60, $this->config );
-		} catch (Exception $e) {
-		    echo $e->getMessage();
-		    return;
-		}
-		if((isset($result['result_code'])&& $result['result_code']=='FAIL')
-		    ||
-		    (isset($result['return_code'])&&$result['return_code']=='FAIL')){
-		    
-		    echo "return_msg:".$result['return_msg']." ;err_code_des: ".$result['err_code_des'];
-		    return;
-		}
-		
-		$url =isset($result['code_url'])? $result ["code_url"]:'';
-		echo  '<input type="hidden" id="xh-wechat-payment-pay-url" value="'.$url.'"/>';
-		echo  '<div style="width:200px;height:200px" id="xh-wechat-payment-pay-img" data-oid="'.$order_id.'"></div>';
+
+        require_once 'lib/lipapay.php';
+        require_once 'lib/lipapay.sign.php';
+
+//参数
+        $uri = dirname($_SERVER['DOCUMENT_URI']);
+        $returnUrl  = 'http://'.$_SERVER['HTTP_HOST'] .$uri. '/return.php';
+        $notifyUrl  = 'http://'.$_SERVER['HTTP_HOST'] .$uri. '/nitify.php';
+
+        $order_sn = md5(date ( "YmdHis" ).$order_id);
+        $param = [];
+        $param['merchantOrderNo'] = $merchantOrderNo = $order_sn;
+        $param['goodsName'] = $goodsName = $this->get_order_title($order);
+        $param['goodsType'] = $goodsType = '2';
+        $param['returnUrl'] = $returnUrl;
+        $param['notifyUrl'] = $notifyUrl;
+        $param['signType'] = $signType = 'MD5';
+        $param['currency'] = $currency = $this->get_option('lipapay_monetary_unit');
+        $param['merchantId'] = $merchantId = $this->get_option('LIPAPAY_MerchantNo');
+        $param['amount']  = $amount =  $order->get_total ();
+        $param['buyerId']  = $buyerId = '1';
+        $param['expirationTime']  = $expirationTime = '100000';
+        $param['sourceType']  = $sourceType = 'B';
+
+        $param['lipapay_key'] = $lipapay_key = $this->get_option('LIPAPAY_KEY');
+        $param['url'] =$url =  $this->get_option('LIPAPAY_URL');
+
+        $sign = lipapay_sign($param,$lipapay_key);
+
+        echo "<form action=$url method='post' class='form-horizontal' id='lipapay_form'>
+    <div class='box-body'>
+
+        <div class='fields-group'>
+            <input name='version' id='version' type='hidden' value='1.3' >
+            <input name='merchantId' id='merchantId'  type='hidden' value='$merchantId' >
+            <input name='signType' id='signType' type='hidden' value='$signType' >
+            <input name='sign' id='sign' type='hidden' value='$sign' >
+            <input name='notifyUrl' id='notifyUrl' type='hidden' value='$notifyUrl' >
+            <input name='returnUrl' id='returnUrl' type='hidden' value='$returnUrl' >
+            <input name='merchantOrderNo' id='merchantOrderNo' type='hidden' value='$merchantOrderNo' >
+            <input name='buyerId' id='buyerId' type='hidden' value='$buyerId' >
+            <input name='amount' id='amount' type='hidden' value='$amount' >
+            <input name='goodsName' id='goodsName' type='hidden' value='$goodsName' >
+            <input name='goodsType' id='goodsType' type='hidden' value='$goodsType' >
+            <input name='expirationTime' id='expirationTime' type='hidden' value='$expirationTime' >
+            <input name='sourceType' id='sourceType' type='hidden' value='$sourceType' >
+            <input name='currency' id='currency' type='hidden' value='$currency' ><div class='box-footer'>
+            </div>
+            <input type='submit' value='submit'>
+
+
+        </div>
+    </div>
+</form>";
+
+
 	}
 }
 

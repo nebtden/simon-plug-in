@@ -26,15 +26,20 @@ class LipapayPaymentConfig{
 }
 function tolipapay($param){
 
-    global $lipapay_config;
-    $url = $lipapay_config['LIPAPAY_URL'];
-    $lipapay_no = $lipapay_config['LIPAPAY_MerchantNo'];
-    $lipapay_key = $lipapay_config['LIPAPAY_KEY'];
-    $return = $lipapay_config['RETURN'];
-    $notify = $lipapay_config['NOTIFY'];
 
+    $url = $param['url'];
+
+
+//    $return = $lipapay_config['RETURN'];
+//    $notify = $lipapay_config['NOTIFY'];
+    $uri = dirname($_SERVER['DOCUMENT_URI']);
+    $return  = 'http://'.$_SERVER['HTTP_HOST'] .$uri. '/return.php';
+    $notify  = 'http://'.$_SERVER['HTTP_HOST'] .$uri. '/nitify.php';
+
+
+    $lipapay_key =$param['lipapay_key'];
     $data = [];
-    $data['merchantId'] = $lipapay_no;
+    $data['merchantId'] = $param['merchantId'];
     $data['signType'] = 'MD5';
     $data['returnUrl'] = $return;
     $data['notifyUrl'] = $notify;
@@ -52,6 +57,8 @@ function tolipapay($param){
 
     return $data;
 }
+
+
 ?>
 
 
