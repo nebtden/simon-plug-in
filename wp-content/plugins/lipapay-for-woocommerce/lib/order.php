@@ -9,7 +9,7 @@
  * @param $order_sn
  * @param $lipapay_order
  */
-function finishOrder($order_sn,$lipapay_order){
+function lipapay_finishOrder($order_sn,$lipapay_order){
 
     if(!hasOrderHandle($order_sn)){
         //

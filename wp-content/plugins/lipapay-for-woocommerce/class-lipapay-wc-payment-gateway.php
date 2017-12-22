@@ -2,6 +2,9 @@
 if (! defined ( 'ABSPATH' ))
 	exit (); // Exit if accessed directly
 
+require_once 'lib/lipapay.php';
+require_once 'lib/lipapay.sign.php';
+
 class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
     private $config;
     
@@ -77,7 +80,7 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 	        ),
             'lipapay_monetary_unit' => array (
                 'title' => __ ( 'lipapay Key', 'lipapay' ),
-                'type' => 'select',
+                'type' => 'text',
                 'description' => __ ( 'Please enter monetary unit，such as kes....', 'Lipapay' ),
                 'css' => 'width:400px',
                 //'desc_tip' => true
@@ -268,13 +271,10 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 	    }
 
 
-        require_once 'lib/lipapay.php';
-        require_once 'lib/lipapay.sign.php';
 
-//参数
-        $uri = dirname($_SERVER['DOCUMENT_URI']);
-        $returnUrl  = 'http://'.$_SERVER['HTTP_HOST'] .$uri. '/return.php';
-        $notifyUrl  = 'http://'.$_SERVER['HTTP_HOST'] .$uri. '/nitify.php';
+        //参数
+        $returnUrl  = $this->get_return_url ( $order );
+        $notifyUrl  = WC()->api_request_url( 'WC_Gateway_PPEC' );
 
         $order_sn = md5(date ( "YmdHis" ).$order_id);
         $param = [];
@@ -286,7 +286,7 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
         $param['signType'] = $signType = 'MD5';
         $param['currency'] = $currency = $this->get_option('lipapay_monetary_unit');
         $param['merchantId'] = $merchantId = $this->get_option('LIPAPAY_MerchantNo');
-        $param['amount']  = $amount =  $order->get_total ();
+        $param['amount']  = $amount =  $order->get_total()*100;
         $param['buyerId']  = $buyerId = '1';
         $param['expirationTime']  = $expirationTime = '100000';
         $param['sourceType']  = $sourceType = 'B';
@@ -324,6 +324,66 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 
 
 	}
+
+
+
+    public function notify(){
+        $lipapay_key =$this->get_option('LIPAPAY_KEY');
+
+        $data = $request = $_POST;
+
+// write the log
+        file_put_contents("log.txt", Date('Y-m-d H:i:s').'notify:'.json_encode($data)."\n", FILE_APPEND);
+
+        $lipapay_sign = $data['sign'];
+        unset($data['sign']);
+        $my_sign = lipapay_sign($data,$lipapay_key);
+        if($my_sign==$lipapay_sign){
+            if($data['status']=='SUCCESS'){
+                $order = new WC_Order($data['trade_order_id']);
+                try{
+                    if(!$order){
+                        throw new Exception('Unknow Order (id:'.$data['trade_order_id'].')');
+                    }
+
+                    if($order->needs_payment()&&$data['status']=='OD'){
+                        $order->payment_complete(isset($data['transacton_id'])?$data['transacton_id']:'');
+                    }
+                }catch(Exception $e){
+                    //looger
+                    $logger = new WC_Logger();
+                    $logger->add( 'lipapay_payment', $e->getMessage() );
+
+                    $params = array(
+                        'action'=>'fail',
+                        'appid'=>$this->get_option('appid'),
+                        'errcode'=>$e->getCode(),
+                        'errmsg'=>$e->getMessage()
+                    );
+
+                    $params['hash']= $lipapay_sign;
+                    ob_clean();
+                    print json_encode($params);
+                    exit;
+                }
+
+                //处理返回给lipapay的参数
+                $return = [];
+                $return['status'] = 'SUCCESS';
+                $return['errorCode'] = '100';
+                $return['merchantId'] = $request['merchantId'];
+                $return['signType'] = 'MD5';
+                $return['merchantOrderNo'] = $request['merchantOrderNo'];
+                $return['orderId'] = $request['orderId'];
+
+                $my_sign = lipapay_sign($return,$lipapay_key);
+                $return['sign'] =$my_sign;
+
+                echo json_encode($return);
+            }
+        }
+    }
+
 }
 
 ?>

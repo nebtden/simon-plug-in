@@ -23,6 +23,7 @@ define('WC_LIPAPAY_URL',rtrim(plugin_dir_url(__FILE__),'/'));
 load_plugin_textdomain( 'lipapay', false, dirname( plugin_basename( __FILE__ ) ) . '/lang/'  );
 add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'lipapay_payment_gateway_plugin_edit_link' );
 add_action( 'init', 'lipapay_wc_payment_gateway_init' );
+//add_action('init', array($XH_Alipay_Payment_WC_Payment_Gateway,'notify'),10);
 
 register_activation_hook ( __FILE__, function(){
     global $wpdb;
@@ -59,5 +60,6 @@ function lipapay_payment_gateway_plugin_edit_link( $links ){
         $links
     );
 }
-//simon zhang  meixihu chuangxin zhongxin  hunan changsha CN19 414401 CN
+
+
 ?>
