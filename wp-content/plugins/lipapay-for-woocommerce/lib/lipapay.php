@@ -4,7 +4,7 @@
  * Date: 2017/12/5
  * Time: 17:05
  */
-require_once 'config.ini.php';
+
 require_once 'lipapay.sign.php';
 
 //add_action( 'admin_notices', 'hello_dolly' );
@@ -57,8 +57,5 @@ function tolipapay($param){
 
     return $data;
 }
-
-
-?>
 
 

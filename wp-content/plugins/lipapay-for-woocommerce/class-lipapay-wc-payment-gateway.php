@@ -1,4 +1,5 @@
 <?php
+
 if (! defined ( 'ABSPATH' ))
 	exit (); // Exit if accessed directly
 
@@ -25,16 +26,10 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 		$this->title = $this->get_option ( 'title' );
 		$this->description = $this->get_option ( 'description' );
 		
-		$lib = WC_LIPAPAY_DIR.'/lib';
-		
-
-		include_once ($lib . '/lipapay.php');
-// 		include_once ($lib . '/lipapay.form.php');
-		include_once ($lib . '/lipapay.sign.php');
-		include_once ($lib . '/notify.php');
-		include_once ($lib . '/return.php');
-//		include_once ($lib . '/log.php');
-		$this->config =new LipapayPaymentConfig ($this->get_option('LIPAPAY_URL'),  $this->get_option('wechatpay_mchId'), $this->get_option('wechatpay_key'));
+//		$lib = WC_LIPAPAY_DIR.'/lib';
+//		include_once ($lib . '/lipapay.php');
+//		include_once ($lib . '/lipapay.sign.php');
+//		$this->config =new LipapayPaymentConfig ($this->get_option('LIPAPAY_URL'),  $this->get_option('wechatpay_mchId'), $this->get_option('wechatpay_key'));
 	}
 	function init_form_fields() {
 	    $this->form_fields = array (
@@ -79,8 +74,10 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 	            //'desc_tip' => true
 	        ),
             'lipapay_monetary_unit' => array (
-                'title' => __ ( 'lipapay Key', 'lipapay' ),
-                'type' => 'text',
+                'title' => __ ( 'monetary unit', 'lipapay' ),
+                'type' => 'select',
+                'options' => ['KES'=>'KES'],
+
                 'description' => __ ( 'Please enter monetary unit，such as kes....', 'Lipapay' ),
                 'css' => 'width:400px',
                 //'desc_tip' => true
@@ -97,11 +94,11 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 	        'redirect' => $order->get_checkout_payment_url ( true )
 	    );
 	}
-	
-	public  function woocommerce_lipapay_add_gateway( $methods ) {
-	    $methods[] = $this;
-	    return $methods;
-	}
+
+    public  function woocommerce_lipapay_add_gateway( $methods ) {
+        $methods[] = 'LIPAPAYWCPaymentGateway';
+        return $methods;
+    }
 	
 	/**
 	 * 
@@ -155,52 +152,70 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 			}
 		}
 	}
-	
-	public function check_lipapay_response() {
-	    if(defined('WP_USE_THEMES')&&!WP_USE_THEMES){
-	        return;
-	    }
-		$xml = isset($GLOBALS ['HTTP_RAW_POST_DATA'])?$GLOBALS ['HTTP_RAW_POST_DATA']:'';	
-		if(empty($xml)){
-		    return ;
-		}
-		
-		// 如果返回成功则验证签名
-		try {
-		    $result = WechatPaymentResults::Init ( $xml );
-		    if (!$result||! isset($result['transaction_id'])) {
-		        return;
-		    }
-		    
-		    $transaction_id=$result ["transaction_id"];
-		    $order_id = $result['attach'];
-		    
-		    $input = new WechatPaymentOrderQuery ();
-		    $input->SetTransaction_id ( $transaction_id );
-		    $query_result = WechatPaymentApi::orderQuery ( $input, $this->config );
-		    if ($query_result['result_code'] == 'FAIL' || $query_result['return_code'] == 'FAIL') {
-                throw new Exception(sprintf("return_msg:%s ;err_code_des:%s "), $query_result['return_msg'], $query_result['err_code_des']);
+
+    public function check_lipapay_response(){
+
+        $lipapay_key =$this->get_option('LIPAPAY_KEY');
+        if($_POST && isset($_POST['merchantOrderNo'])){
+            $data = $request = $_POST;
+
+// write the log
+            file_put_contents("log.txt", Date('Y-m-d H:i:s').'notify:'.json_encode($data)."\n", FILE_APPEND);
+
+            $lipapay_sign = $data['sign'];
+            unset($data['sign']);
+            $my_sign = lipapay_sign($data,$lipapay_key);
+            $result = $my_sign==$lipapay_sign?:true;false;
+            $result = true;
+            if($result){
+                if($data['status']=='SUCCESS'){
+                    $order = new WC_Order($data['merchantOrderNo']);
+                    try{
+                        if(!$order){
+                            throw new Exception('Unknow Order (id:'.$data['merchantOrderNo'].')');
+                        }
+
+                        if($order->needs_payment()){
+                            $order->payment_complete(isset($data['merchantOrderNo'])?$data['merchantOrderNo']:'');
+                        }
+                    }catch(Exception $e){
+                        //looger
+                        $logger = new WC_Logger();
+                        $logger->add( 'lipapay_payment', $e->getMessage() );
+
+                        $params = array(
+                            'action'=>'fail',
+                            'appid'=>$this->get_option('LIPAPAY_KEY'),
+                            'errcode'=>$e->getCode(),
+                            'errmsg'=>$e->getMessage()
+                        );
+
+                        $params['hash']= $lipapay_sign;
+                        ob_clean();
+                        print json_encode($params);
+                        exit;
+                    }
+
+                    //处理返回给lipapay的参数
+                    $return = [];
+                    $return['status'] = 'SUCCESS';
+                    $return['errorCode'] = '100';
+                    $return['merchantId'] = $request['merchantId'];
+                    $return['signType'] = 'MD5';
+                    $return['merchantOrderNo'] = $request['merchantOrderNo'];
+                    $return['orderId'] = $request['orderId'];
+
+                    $my_sign = lipapay_sign($return,$lipapay_key);
+                    $return['sign'] =$my_sign;
+
+                    echo json_encode($return);
+                    exit();
+                }
             }
-            
-            if(!(isset($query_result['trade_state'])&& $query_result['trade_state']=='SUCCESS')){
-                throw new Exception("order not paid!");
-            }
-		  
-		    $order = new WC_Order ( $order_id );
-		    if($order->needs_payment()){
-		          $order->payment_complete ($transaction_id);
-		    }
-		    
-		    $reply = new WechatPaymentNotifyReply ();
-		    $reply->SetReturn_code ( "SUCCESS" );
-		    $reply->SetReturn_msg ( "OK" );
-		    
-		    WxpayApi::replyNotify ( $reply->ToXml () );
-		    exit;
-		} catch ( WechatPaymentException $e ) {
-		    return;
-		}
-	}
+        }
+
+
+    }
 
 	public function process_refund( $order_id, $amount = null, $reason = ''){		
 		$order = new WC_Order ($order_id );
@@ -274,9 +289,9 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 
         //参数
         $returnUrl  = $this->get_return_url ( $order );
-        $notifyUrl  = WC()->api_request_url( 'WC_Gateway_PPEC' );
+        $notifyUrl  = WC()->api_request_url( 'LIPAPAYWCPaymentGateway' );
 
-        $order_sn = md5(date ( "YmdHis" ).$order_id);
+        $order_sn = $order_id;
         $param = [];
         $param['merchantOrderNo'] = $merchantOrderNo = $order_sn;
         $param['goodsName'] = $goodsName = $this->get_order_title($order);
@@ -346,8 +361,8 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
                         throw new Exception('Unknow Order (id:'.$data['trade_order_id'].')');
                     }
 
-                    if($order->needs_payment()&&$data['status']=='OD'){
-                        $order->payment_complete(isset($data['transacton_id'])?$data['transacton_id']:'');
+                    if($order->needs_payment()){
+                        $order->payment_complete(isset($data['trade_order_id'])?$data['trade_order_id']:'');
                     }
                 }catch(Exception $e){
                     //looger

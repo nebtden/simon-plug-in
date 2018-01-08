@@ -4,10 +4,10 @@
  * Date: 2017/12/5
  * Time: 17:23
  */
-require_once 'config.ini.php';
+
 require_once 'order.php';
 require_once 'lipapay.sign.php';
-$lipapay_key = $lipapay_config['LIPAPAY_KEY'];
+//$lipapay_key = $lipapay_config['LIPAPAY_KEY'];
 
 
 
