@@ -16,7 +16,7 @@ $param['goodsType'] = '2';
 $param['currency'] = 'KES';
 $param['amount']  = '1';
 $param['buyerId']  = '1';
-$data = tolipapay($param);
+$data = toLipaPay($param);
 
 
 

@@ -6,8 +6,8 @@
  * Time: 20:34
  */
 
-//lipapay加密函数
-function lipapay_sign($data, $lipapay_key)
+//LipaPay加密函数
+function LipaPay_sign($data, $LipaPay_key)
 {
     //检测参数是否在这个列表，排除其他参数
     $fields = [
@@ -34,7 +34,7 @@ function lipapay_sign($data, $lipapay_key)
     }
     $str = substr($str, 0, strlen($str) - 1);
 
-    $sign = md5($str . $lipapay_key);
+    $sign = md5($str . $LipaPay_key);
     return $sign;
 }
 

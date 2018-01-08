@@ -21,7 +21,7 @@ msgid "Enable/Disable"
 msgstr "启用/禁用"
 
 #: class-xh-wechat-wc-payment-gateway.php:40
-msgid "Enable Lipapay Payment"
+msgid "Enable LipaPay Payment"
 msgstr "启用微信支付"
 
 #: class-xh-wechat-wc-payment-gateway.php:44
@@ -33,7 +33,7 @@ msgid "This controls the title which the user sees during checkout."
 msgstr "支付网关名称，用户结账时显示"
 
 #: class-xh-wechat-wc-payment-gateway.php:47
-msgid "Lipapay"
+msgid "LipaPay"
 msgstr "微信支付"
 
 #: class-xh-wechat-wc-payment-gateway.php:51
@@ -46,8 +46,8 @@ msgstr "描述一下支付网关，用户结账时会看到"
 
 #: class-xh-wechat-wc-payment-gateway.php:54
 msgid ""
-"Pay via Lipapay, if you don't have an Lipapay account, you should contact us"
-msgstr "通过Lipapay支付，如果没有微信账号，也可以绑定卡号支付"
+"Pay via LipaPay, if you don't have an LipaPay account, you should contact us"
+msgstr "通过LipaPay支付，如果没有微信账号，也可以绑定卡号支付"
 
 #: class-xh-wechat-wc-payment-gateway.php:59
 msgid "Application ID"

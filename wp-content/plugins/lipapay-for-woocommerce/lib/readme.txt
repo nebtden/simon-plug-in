@@ -1,5 +1,5 @@
-=== Lipapay ===
-Contributors: simon.zhang
+=== LipaPay ===
+Contributors: simon.zhang@kilimall.com
 Tags:
 Requires at least: 1.0
 Tested up to: 4.9

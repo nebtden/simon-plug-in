@@ -7,24 +7,22 @@
 
 require_once 'order.php';
 require_once 'lipapay.sign.php';
-//$lipapay_key = $lipapay_config['LIPAPAY_KEY'];
+//$LipaPay_key = $LipaPay_config['LIPAPAY_KEY'];
 
 
 
 $data = $request = $_POST;
 
-// write the log
-file_put_contents("log.txt", Date('Y-m-d H:i:s').'notify:'.json_encode($data)."\n", FILE_APPEND);
 
-$lipapay_sign = $data['sign'];
+$LipaPay_sign = $data['sign'];
 unset($data['sign']);
-$my_sign = lipapay_sign($data,$lipapay_key);
-if($my_sign==$lipapay_sign){
+$my_sign = LipaPay_sign($data,$LipaPay_key);
+if($my_sign==$LipaPay_sign){
     if($data['status']=='SUCCESS'){
         //处理逻辑
         finishOrder($data['merchantOrderNo'],$data['orderId']);
 		
-		//处理返回给lipapay的参数
+		//处理返回给LipaPay的参数
 		$return = [];
 		$return['status'] = 'SUCCESS';
 		$return['errorCode'] = '100';
@@ -33,7 +31,7 @@ if($my_sign==$lipapay_sign){
 		$return['merchantOrderNo'] = $request['merchantOrderNo'];
 		$return['orderId'] = $request['orderId'];
 
-		$my_sign = sign($return,$lipapay_key);
+		$my_sign = sign($return,$LipaPay_key);
 		$return['sign'] =$my_sign;
 
 		echo json_encode($return);

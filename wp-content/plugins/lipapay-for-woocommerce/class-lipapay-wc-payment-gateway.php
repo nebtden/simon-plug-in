@@ -3,22 +3,22 @@
 if (! defined ( 'ABSPATH' ))
 	exit (); // Exit if accessed directly
 
-require_once 'lib/lipapay.php';
-require_once 'lib/lipapay.sign.php';
+require_once 'lib/LipaPay.php';
+require_once 'lib/LipaPay.sign.php';
 
 class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
     private $config;
     
 	public function __construct() {
 
-		array_push($this->supports,'refunds');
+//		array_push($this->supports,'refunds');
 
 		$this->id = WC_LIPAPAY_ID;
 		$this->icon =WC_LIPAPAY_URL. '/images/logo.png';
 		$this->has_fields = false;
 		
-		$this->method_title = 'Lipapay'; // checkout option title
-	    $this->method_description=' ..................for simon test....... ';
+		$this->method_title = 'LipaPay'; // checkout option title
+	    $this->method_description=' ..................author:simon.zhang@kilimall.com  ';
 	   
 		$this->init_form_fields ();
 		$this->init_settings ();
@@ -27,58 +27,58 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 		$this->description = $this->get_option ( 'description' );
 		
 //		$lib = WC_LIPAPAY_DIR.'/lib';
-//		include_once ($lib . '/lipapay.php');
-//		include_once ($lib . '/lipapay.sign.php');
-//		$this->config =new LipapayPaymentConfig ($this->get_option('LIPAPAY_URL'),  $this->get_option('wechatpay_mchId'), $this->get_option('wechatpay_key'));
+//		include_once ($lib . '/LipaPay.php');
+//		include_once ($lib . '/LipaPay.sign.php');
+//		$this->config =new LipaPayPaymentConfig ($this->get_option('LIPAPAY_URL'),  $this->get_option('wechatpay_mchId'), $this->get_option('wechatpay_key'));
 	}
 	function init_form_fields() {
 	    $this->form_fields = array (
 	        'enabled' => array (
-	            'title' => __ ( 'Enable/Disable', 'lipapay' ),
+	            'title' => __ ( 'Enable/Disable', 'LipaPay' ),
 	            'type' => 'checkbox',
-	            'label' => __ ( 'Enable Lipapay Payment', 'lipapay' ),
+	            'label' => __ ( 'Enable LipaPay Payment', 'LipaPay' ),
 	            'default' => 'no'
 	        ),
 	        'title' => array (
-	            'title' => 'Lipapay',
+	            'title' => 'LipaPay',
 	            'type' => 'text',
-	            'description' => __ ( 'This controls the title which the user sees during checkout.', 'Lipapay' ),
-	            'default' => 'Lipapay',
+	            'description' => __ ( 'This controls the title which the user sees during checkout.', 'LipaPay' ),
+	            'default' => 'LipaPay',
 	            'css' => 'width:400px'
 	        ),
 	        'description' => array (
-	            'title' => __ ( 'Description', 'Lipapay' ),
+	            'title' => __ ( 'Description', 'LipaPay' ),
 	            'type' => 'textarea',
-	            'description' =>  'This controls the description which the user sees during checkout.', 'Lipapay' ,
-	            'default' => "Pay via lipapay, if you don't have an Lipapay account, you should contact us", 'Lipapay' ,
+	            'description' =>  'This controls the description which the user sees during checkout.', 'LipaPay' ,
+	            'default' => "Pay via LipaPay, if you don't have an LipaPay account, you should contact us", 'LipaPay' ,
 	            //'desc_tip' => true ,
 	            'css' => 'width:400px'
 	        ),
 	        'LIPAPAY_URL' => array (
-	            'title' => __ ( 'Application ID', 'Lipapay' ),
+	            'title' => __ ( 'LIPAPAY SERVER URL', 'LipaPay' ),
 	            'type' => 'text',
-	            'description' => __ ( 'Please enter the LIPAPAY URL,Generally not required ', 'Lipapay' ),
+	            'description' => __ ( 'Please enter the LIPAPAY URL,Generally not required ', 'LipaPay' ),
 	            'css' => 'width:400px'
 	        ),
 	        'LIPAPAY_MerchantNo' => array (
-	            'title' => __ ( 'lipapay Merchant ID', 'Lipapay' ),
+	            'title' => __ ( 'LipaPay Merchant ID', 'LipaPay' ),
 	            'type' => 'text',
-	            'description' => __ ( 'Please enter the LIPAPAY MerchantNo，required ', 'Lipapay' ),
+	            'description' => __ ( 'Please enter the LIPAPAY MerchantNo，required ', 'LipaPay' ),
 	            'css' => 'width:400px'
 	        ),
 	        'LIPAPAY_KEY' => array (
-	            'title' => __ ( 'lipapay Key', 'KES' ),
+	            'title' => __ ( 'LipaPay Key', 'KES' ),
 	            'type' => 'text',
-	            'description' => __ ( 'Please enter the LIPAPAY KEY，required.', 'Lipapay' ),
+	            'description' => __ ( 'Please enter the LIPAPAY KEY，required.', 'LipaPay' ),
 	            'css' => 'width:400px',
 	            //'desc_tip' => true
 	        ),
-            'lipapay_monetary_unit' => array (
-                'title' => __ ( 'monetary unit', 'lipapay' ),
+            'LipaPay_monetary_unit' => array (
+                'title' => __ ( 'monetary unit', 'KES' ),
                 'type' => 'select',
-                'options' => ['KES'=>'KES'],
+                'options' => ['KES'=>'KES','NGN'=>'NGN'],
 
-                'description' => __ ( 'Please enter monetary unit，such as kes....', 'Lipapay' ),
+                'description' => __ ( 'Please enter monetary unit，such as kes....', 'LipaPay' ),
                 'css' => 'width:400px',
                 //'desc_tip' => true
             )
@@ -95,7 +95,7 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 	    );
 	}
 
-    public  function woocommerce_lipapay_add_gateway( $methods ) {
+    public  function woocommerce_LipaPay_add_gateway( $methods ) {
         $methods[] = 'LIPAPAYWCPaymentGateway';
         return $methods;
     }
@@ -123,7 +123,7 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 		    }    
 		}
 		
-		return apply_filters('lipapay_wc_get_order_title', mb_strimwidth ( $title, 0,32, '...','utf-8'));
+		return apply_filters('LipaPay_wc_get_order_title', mb_strimwidth ( $title, 0,32, '...','utf-8'));
 	}
 	
 	public function get_order_status() {
@@ -153,19 +153,17 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 		}
 	}
 
-    public function check_lipapay_response(){
+    public function check_LipaPay_response(){
 
-        $lipapay_key =$this->get_option('LIPAPAY_KEY');
+        $LipaPay_key =$this->get_option('LIPAPAY_KEY');
         if($_POST && isset($_POST['merchantOrderNo'])){
             $data = $request = $_POST;
 
-// write the log
-            file_put_contents("log.txt", Date('Y-m-d H:i:s').'notify:'.json_encode($data)."\n", FILE_APPEND);
 
-            $lipapay_sign = $data['sign'];
+            $LipaPay_sign = $data['sign'];
             unset($data['sign']);
-            $my_sign = lipapay_sign($data,$lipapay_key);
-            $result = $my_sign==$lipapay_sign?:true;false;
+            $my_sign = LipaPay_sign($data,$LipaPay_key);
+            $result = $my_sign==$LipaPay_sign?:true;false;
             $result = true;
             if($result){
                 if($data['status']=='SUCCESS'){
@@ -181,7 +179,7 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
                     }catch(Exception $e){
                         //looger
                         $logger = new WC_Logger();
-                        $logger->add( 'lipapay_payment', $e->getMessage() );
+                        $logger->add( 'LipaPay_payment', $e->getMessage() );
 
                         $params = array(
                             'action'=>'fail',
@@ -190,13 +188,13 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
                             'errmsg'=>$e->getMessage()
                         );
 
-                        $params['hash']= $lipapay_sign;
+                        $params['hash']= $LipaPay_sign;
                         ob_clean();
                         print json_encode($params);
                         exit;
                     }
 
-                    //处理返回给lipapay的参数
+                    //处理返回给LipaPay的参数
                     $return = [];
                     $return['status'] = 'SUCCESS';
                     $return['errorCode'] = '100';
@@ -205,7 +203,7 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
                     $return['merchantOrderNo'] = $request['merchantOrderNo'];
                     $return['orderId'] = $request['orderId'];
 
-                    $my_sign = lipapay_sign($return,$lipapay_key);
+                    $my_sign = LipaPay_sign($return,$LipaPay_key);
                     $return['sign'] =$my_sign;
 
                     echo json_encode($return);
@@ -217,62 +215,6 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 
     }
 
-	public function process_refund( $order_id, $amount = null, $reason = ''){		
-		$order = new WC_Order ($order_id );
-		if(!$order){
-			return new WP_Error( 'invalid_order','错误的订单' );
-		}
-	
-		$trade_no =$order->get_transaction_id();
-		if (empty ( $trade_no )) {
-			return new WP_Error( 'invalid_order', '未找到微信支付交易号或订单未支付' );
-		}
-	
-		$total = $order->get_total ();
-		//$amount = $amount;
-        $preTotal = $total;
-        $preAmount = $amount;
-        
-		$exchange_rate = floatval($this->get_option('exchange_rate'));
-		if($exchange_rate<=0){
-			$exchange_rate=1;
-		}
-			
-		$total = round ( $total * $exchange_rate, 2 );
-		$amount = round ( $amount * $exchange_rate, 2 );
-      
-        $total = ( int ) ( $total  * 100);
-		$amount = ( int ) ($amount * 100);
-        
-		if($amount<=0||$amount>$total){
-			return new WP_Error( 'invalid_order',__('Invalid refused amount!' ,XH_WECHAT) );
-		}
-	
-		$transaction_id = $trade_no;
-		$total_fee = $total;
-		$refund_fee = $amount;
-	
-		$input = new WechatPaymentRefund ();
-		$input->SetTransaction_id ( $transaction_id );
-		$input->SetTotal_fee ( $total_fee );
-		$input->SetRefund_fee ( $refund_fee );
-	
-		$input->SetOut_refund_no ( $order_id.time());
-		$input->SetOp_user_id ( $this->config->getMCHID());
-	
-		try {
-			$result = WechatPaymentApi::refund ( $input,60 ,$this->config);
-			if ($result ['result_code'] == 'FAIL' || $result ['return_code'] == 'FAIL') {
-				Log::DEBUG ( " XHWechatPaymentApi::orderQuery:" . json_encode ( $result ) );
-				throw new Exception ("return_msg:". $result ['return_msg'].';err_code_des:'. $result ['err_code_des'] );
-			}
-	
-		} catch ( Exception $e ) {
-			return new WP_Error( 'invalid_order',$e->getMessage ());
-		}
-	
-		return true;
-	}
 
 	/**
 	 * 
@@ -299,19 +241,19 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
         $param['returnUrl'] = $returnUrl;
         $param['notifyUrl'] = $notifyUrl;
         $param['signType'] = $signType = 'MD5';
-        $param['currency'] = $currency = $this->get_option('lipapay_monetary_unit');
+        $param['currency'] = $currency = $this->get_option('LipaPay_monetary_unit');
         $param['merchantId'] = $merchantId = $this->get_option('LIPAPAY_MerchantNo');
         $param['amount']  = $amount =  $order->get_total()*100;
         $param['buyerId']  = $buyerId = '1';
         $param['expirationTime']  = $expirationTime = '100000';
         $param['sourceType']  = $sourceType = 'B';
 
-        $param['lipapay_key'] = $lipapay_key = $this->get_option('LIPAPAY_KEY');
+        $param['LipaPay_key'] = $LipaPay_key = $this->get_option('LIPAPAY_KEY');
         $param['url'] =$url =  $this->get_option('LIPAPAY_URL');
 
-        $sign = lipapay_sign($param,$lipapay_key);
+        $sign = LipaPay_sign($param,$LipaPay_key);
 
-        echo "<form action=$url method='post' class='form-horizontal' id='lipapay_form'>
+        echo "<form action=$url method='post' class='form-horizontal' id='LipaPay_form'>
     <div class='box-body'>
 
         <div class='fields-group'>
@@ -343,17 +285,15 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 
 
     public function notify(){
-        $lipapay_key =$this->get_option('LIPAPAY_KEY');
+        $LipaPay_key =$this->get_option('LIPAPAY_KEY');
 
         $data = $request = $_POST;
 
-// write the log
-        file_put_contents("log.txt", Date('Y-m-d H:i:s').'notify:'.json_encode($data)."\n", FILE_APPEND);
 
-        $lipapay_sign = $data['sign'];
+        $LipaPay_sign = $data['sign'];
         unset($data['sign']);
-        $my_sign = lipapay_sign($data,$lipapay_key);
-        if($my_sign==$lipapay_sign){
+        $my_sign = LipaPay_sign($data,$LipaPay_key);
+        if($my_sign==$LipaPay_sign){
             if($data['status']=='SUCCESS'){
                 $order = new WC_Order($data['trade_order_id']);
                 try{
@@ -367,7 +307,7 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
                 }catch(Exception $e){
                     //looger
                     $logger = new WC_Logger();
-                    $logger->add( 'lipapay_payment', $e->getMessage() );
+                    $logger->add( 'LipaPay_payment', $e->getMessage() );
 
                     $params = array(
                         'action'=>'fail',
@@ -376,13 +316,13 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
                         'errmsg'=>$e->getMessage()
                     );
 
-                    $params['hash']= $lipapay_sign;
+                    $params['hash']= $LipaPay_sign;
                     ob_clean();
                     print json_encode($params);
                     exit;
                 }
 
-                //处理返回给lipapay的参数
+                //处理返回给LipaPay的参数
                 $return = [];
                 $return['status'] = 'SUCCESS';
                 $return['errorCode'] = '100';
@@ -391,7 +331,7 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
                 $return['merchantOrderNo'] = $request['merchantOrderNo'];
                 $return['orderId'] = $request['orderId'];
 
-                $my_sign = lipapay_sign($return,$lipapay_key);
+                $my_sign = LipaPay_sign($return,$LipaPay_key);
                 $return['sign'] =$my_sign;
 
                 echo json_encode($return);

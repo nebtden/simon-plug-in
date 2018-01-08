@@ -7,13 +7,13 @@
 
 /**
  * @param $order_sn
- * @param $lipapay_order
+ * @param $LipaPay_order
  */
-function lipapay_finishOrder($order_sn,$lipapay_order){
+function LipaPay_finishOrder($order_sn,$LipaPay_order){
 
     if(!hasOrderHandle($order_sn)){
         //
-        handleOrder($order_sn,$lipapay_order);
+        handleOrder($order_sn,$LipaPay_order);
     }
 }
 
@@ -29,7 +29,7 @@ function hasOrderHandle($order_sn){
  * 真实处理订单步骤，比如更改订单状态，添加积分，发货，添加余额等操作。。
    
  */
-function handleOrder($order_sn,$lipapay_order){
+function handleOrder($order_sn,$LipaPay_order){
 
 }
 

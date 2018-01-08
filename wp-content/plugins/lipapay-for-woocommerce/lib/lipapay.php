@@ -10,7 +10,7 @@ require_once 'lipapay.sign.php';
 //add_action( 'admin_notices', 'hello_dolly' );
  
  //返回组装好的lipay参数
-class LipapayPaymentConfig{
+class LipaPayPaymentConfig{
 
     private $LIPAPAY_URL;
     private $LIPAPAY_MerchantNo;
@@ -24,20 +24,20 @@ class LipapayPaymentConfig{
 
     }
 }
-function tolipapay($param){
+function toLipaPay($param){
 
 
     $url = $param['url'];
 
 
-//    $return = $lipapay_config['RETURN'];
-//    $notify = $lipapay_config['NOTIFY'];
+//    $return = $LipaPay_config['RETURN'];
+//    $notify = $LipaPay_config['NOTIFY'];
     $uri = dirname($_SERVER['DOCUMENT_URI']);
     $return  = 'http://'.$_SERVER['HTTP_HOST'] .$uri. '/return.php';
     $notify  = 'http://'.$_SERVER['HTTP_HOST'] .$uri. '/nitify.php';
 
 
-    $lipapay_key =$param['lipapay_key'];
+    $LipaPay_key =$param['LipaPay_key'];
     $data = [];
     $data['merchantId'] = $param['merchantId'];
     $data['signType'] = 'MD5';
@@ -51,7 +51,7 @@ function tolipapay($param){
     $data['expirationTime'] = '100000';
     $data['sourceType'] = 'B';
     $data['currency'] =$param['currency'];
-    $sign = sign($data,$lipapay_key);
+    $sign = sign($data,$LipaPay_key);
     $data['sign'] = $sign;
     $data['url'] = $url;
 

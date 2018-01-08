@@ -1,6 +1,6 @@
 
-发起lipapay支付操作，只需要三个步骤
-1、配置lipapay相关文件
+发起LipaPay支付操作，只需要三个步骤
+1、配置LipaPay相关文件
 config.ini.php
 
 2、配置index.php里面的param参数
