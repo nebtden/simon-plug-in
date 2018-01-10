@@ -3,8 +3,8 @@
 if (! defined ( 'ABSPATH' ))
 	exit (); // Exit if accessed directly
 
-require_once 'lib/LipaPay.php';
-require_once 'lib/LipaPay.sign.php';
+require_once 'lib/lipapay.php';
+require_once 'lib/lipapay.sign.php';
 
 class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
     private $config;
@@ -17,19 +17,16 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 		$this->icon =WC_LIPAPAY_URL. '/images/logo.png';
 		$this->has_fields = false;
 		
-		$this->method_title = 'LipaPay'; // checkout option title
-	    $this->method_description=' ..................author:simon.zhang@kilimall.com  ';
+		$this->method_title = 'LipaPay for WooCommerce'; // checkout option title
+	    $this->method_description='author:simon.zhang@kilimall.com  ';
 	   
 		$this->init_form_fields ();
 		$this->init_settings ();
 		
-		$this->title = $this->get_option ( 'title' );
-		$this->description = $this->get_option ( 'description' );
+		$this->title = 'LipaPay';
+		$this->description = 'Lipapay is a leading online payment  provider in Africa that guarantee money-back  & data encryption.';
 		
-//		$lib = WC_LIPAPAY_DIR.'/lib';
-//		include_once ($lib . '/LipaPay.php');
-//		include_once ($lib . '/LipaPay.sign.php');
-//		$this->config =new LipaPayPaymentConfig ($this->get_option('LIPAPAY_URL'),  $this->get_option('wechatpay_mchId'), $this->get_option('wechatpay_key'));
+
 	}
 	function init_form_fields() {
 	    $this->form_fields = array (
@@ -37,48 +34,38 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
 	            'title' => __ ( 'Enable/Disable', 'LipaPay' ),
 	            'type' => 'checkbox',
 	            'label' => __ ( 'Enable LipaPay Payment', 'LipaPay' ),
-	            'default' => 'no'
+	            'default' => 'yes'
 	        ),
-	        'title' => array (
-	            'title' => 'LipaPay',
-	            'type' => 'text',
-	            'description' => __ ( 'This controls the title which the user sees during checkout.', 'LipaPay' ),
-	            'default' => 'LipaPay',
-	            'css' => 'width:400px'
-	        ),
-	        'description' => array (
-	            'title' => __ ( 'Description', 'LipaPay' ),
-	            'type' => 'textarea',
-	            'description' =>  'This controls the description which the user sees during checkout.', 'LipaPay' ,
-	            'default' => "Pay via LipaPay, if you don't have an LipaPay account, you should contact us", 'LipaPay' ,
-	            //'desc_tip' => true ,
-	            'css' => 'width:400px'
-	        ),
+
+
 	        'LIPAPAY_URL' => array (
-	            'title' => __ ( 'LIPAPAY SERVER URL', 'LipaPay' ),
-	            'type' => 'text',
-	            'description' => __ ( 'Please enter the LIPAPAY URL,Generally not required ', 'LipaPay' ),
-	            'css' => 'width:400px'
+	            'title' => __ ( 'LIPAPAY SERVER URL'),
+	            'type' => 'select',
+                'default' => 'testing',
+                'options' => [
+                    'testing'=>'Testing environment',
+                    'production'=>'Production environment'],
+	            'description' => "if you need to test the payment, please select the 'Testing environment', or else select the 'Production environment'",
+
 	        ),
 	        'LIPAPAY_MerchantNo' => array (
-	            'title' => __ ( 'LipaPay Merchant ID', 'LipaPay' ),
+	            'title' => __ ( 'Merchant  Lipapay No.','Please enter the Merchant  Lipapay No.  （Required）'),
 	            'type' => 'text',
-	            'description' => __ ( 'Please enter the LIPAPAY MerchantNo，required ', 'LipaPay' ),
+	            'description' => "If you do not have, please contact lipapay for application.(info@lipapay.com)",
 	            'css' => 'width:400px'
 	        ),
 	        'LIPAPAY_KEY' => array (
-	            'title' => __ ( 'LipaPay Key', 'KES' ),
+	            'title' => __ ( 'Merchant Lipapay Key', 'Please enter the Merchant  Lipapay No. (Required)' ),
 	            'type' => 'text',
-	            'description' => __ ( 'Please enter the LIPAPAY KEY，required.', 'LipaPay' ),
+	            'description' => "If you do not have, please contact lipapay for application.(info@lipapay.com)",
 	            'css' => 'width:400px',
 	            //'desc_tip' => true
 	        ),
             'LipaPay_monetary_unit' => array (
-                'title' => __ ( 'monetary unit', 'KES' ),
+                'title' => __ ( 'Currency', 'KES' ),
                 'type' => 'select',
                 'options' => ['KES'=>'KES','NGN'=>'NGN'],
-
-                'description' => __ ( 'Please enter monetary unit，such as kes....', 'LipaPay' ),
+                'description' => 'Please choose the currency.',
                 'css' => 'width:400px',
                 //'desc_tip' => true
             )
@@ -249,7 +236,15 @@ class LIPAPAYWCPaymentGateway extends WC_Payment_Gateway {
         $param['sourceType']  = $sourceType = 'B';
 
         $param['LipaPay_key'] = $LipaPay_key = $this->get_option('LIPAPAY_KEY');
-        $param['url'] =$url =  $this->get_option('LIPAPAY_URL');
+
+        $env = $this->get_option('LIPAPAY_URL');
+
+        if($env=='testing'){
+            $param['url'] =$url = 'http://sandbox.lipapay.com/api/excashier.html';
+        }else{
+            $param['url'] =$url =  'http://www.lipapay.com/api/excashier.html';
+        }
+
 
         $sign = LipaPay_sign($param,$LipaPay_key);
 

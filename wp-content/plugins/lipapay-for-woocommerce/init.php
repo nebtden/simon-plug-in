@@ -1,12 +1,12 @@
 <?php
 /*
- * Plugin Name: LipaPay
- * Plugin URI: https://www.LipaPay.com
+ * Plugin Name: LipaPay for WooCommerce
+ * Plugin URI: https://www.lipapay.com
  * Description:
- * Version: 1.8.3
+ * Version: 1.04
  * Author:  simon.zhang
- * Author URI:https://www.LipaPay.com
- * Text Domain: WeiXin Payments for WooCommerce
+ * Author URI:https://www.lipapay.com
+ * Text Domain: Lipapay Payments for WooCommerce
  */
 if (! defined ( 'ABSPATH' ))
 	exit (); // Exit if accessed directly
@@ -20,7 +20,7 @@ define('WC_LIPAPAY_VERSION','0.1.0');
 define('WC_LIPAPAY_ID','LipaPaywcpaymentgateway' /*'xh-wechat'*/);
 define('WC_LIPAPAY_DIR',rtrim(plugin_dir_path(__FILE__),'/'));
 define('WC_LIPAPAY_URL',rtrim(plugin_dir_url(__FILE__),'/'));
-load_plugin_textdomain( 'LipaPay', false, dirname( plugin_basename( __FILE__ ) ) . '/lang/'  );
+
 add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'LipaPay_payment_gateway_plugin_edit_link' );
 add_action( 'init', 'LipaPay_wc_payment_gateway_init' );
 //add_action('init', array($XH_Alipay_Payment_WC_Payment_Gateway,'notify'),10);

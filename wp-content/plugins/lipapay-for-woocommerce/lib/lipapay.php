@@ -9,7 +9,7 @@ require_once 'lipapay.sign.php';
 
 //add_action( 'admin_notices', 'hello_dolly' );
  
- //返回组装好的lipay参数
+ //return the lipapay config
 class LipaPayPaymentConfig{
 
     private $LIPAPAY_URL;
